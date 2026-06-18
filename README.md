@@ -207,6 +207,6 @@ This project demonstrates:
 * scikit-learn
 * Jupyter Notebook
 
-## Resume-ready summary
+## Summary
 
 Built an end-to-end NZD/USD exchange-rate forecasting project using historical daily exchange-rate data. Cleaned and transformed raw time-series data, created baseline forecasts, tested stationarity and autocorrelation, fitted ARIMA models, engineered lagged and rolling features for supervised learning, and evaluated linear, regularized, and tree-based models against naïve and drift baselines. Found that simple baselines outperformed more complex models, highlighting the importance of rigorous out-of-sample evaluation in financial forecasting.
