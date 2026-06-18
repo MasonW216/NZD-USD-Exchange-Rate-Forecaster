@@ -1,189 +1,212 @@
-# NZD-USD-Exchange-Rate-Forecaster
+# NZD/USD Exchange-Rate Forecasting
 
-## Overview
+This project builds and evaluates forecasting models for the NZD/USD exchange rate using historical daily exchange-rate data.
 
-This project analyzes and prepares historical NZD/USD exchange-rate data for time-series forecasting. The project is motivated by a practical use case: understanding exchange-rate movements that matter for New Zealand international students and families managing money across NZD and USD.
+The goal is not only to test forecasting models, but to follow a realistic time-series modeling workflow: data cleaning, transformation, baseline forecasting, stationarity analysis, ARIMA modeling, supervised machine-learning forecasting, and out-of-sample model evaluation.
 
-The current version focuses on the first stage of the project: **data auditing, cleaning, transformation, and exploratory visualization**. Forecasting models have not been built yet.
+## Project overview
 
-## Current Project Stage
-
-Completed so far:
-
-* Loaded historical exchange-rate data from FRED.
-* Audited the raw dataset structure.
-* Confirmed the meaning of the FRED `DEXUSNZ` series.
-* Checked the date range, date formatting, chronological ordering, and duplicate dates.
-* Investigated missing exchange-rate observations.
-* Removed missing exchange-rate rows for the cleaned working dataset.
-* Created a log-transformed exchange-rate series.
-* Created daily log returns.
-* Produced initial visualizations of:
-
-  * the NZD/USD exchange-rate level;
-  * the log NZD/USD exchange rate;
-  * daily NZD/USD log returns.
-* Saved a cleaned and transformed dataset for later modeling.
-
-## Data Source
-
-The dataset comes from FRED and uses the series:
-
-`DEXUSNZ`
-
-This series represents:
+The dataset uses the FRED `DEXUSNZ` exchange-rate series, which represents:
 
 > U.S. dollars per 1 New Zealand dollar
 
-In other words:
+This means higher values indicate a stronger New Zealand dollar relative to the U.S. dollar, while lower values indicate a weaker New Zealand dollar relative to the U.S. dollar.
 
-```text
-1 NZD = x USD
-```
+The project evaluates whether ARIMA-style models and supervised machine-learning models can improve forecast accuracy compared with simple baseline forecasts.
 
-This project currently uses `DEXUSNZ` directly, so the project is focused on modeling the **NZD/USD exchange rate**, not the inverted USD/NZD rate.
-
-## Dataset
-
-The raw dataset contains two columns:
-
-```text
-observation_date
-DEXUSNZ
-```
-
-After cleaning and transformation, the processed dataset contains:
-
-```text
-observation_date
-DEXUSNZ
-log_nzd_usd
-nzd_usd_return
-```
-
-Column meanings:
-
-| Column             | Meaning                                       |
-| ------------------ | --------------------------------------------- |
-| `observation_date` | Date of the exchange-rate observation         |
-| `DEXUSNZ`          | U.S. dollars per 1 New Zealand dollar         |
-| `log_nzd_usd`      | Natural log of `DEXUSNZ`                      |
-| `nzd_usd_return`   | Daily log return of the NZD/USD exchange rate |
-
-## Data Audit Summary
-
-The raw dataset covers observations from:
-
-```text
-2016-06-06 to 2026-06-05
-```
-
-The dataset originally contained:
-
-```text
-2,610 rows
-```
-
-The `DEXUSNZ` column contained:
-
-```text
-112 missing values
-```
-
-After removing missing exchange-rate observations, the cleaned dataset contains:
-
-```text
-2,498 usable observations
-```
-
-The missing values appeared to occur mostly on holidays or non-publication days, rather than from obvious data corruption.
-
-## Initial Findings
-
-The `DEXUSNZ` exchange-rate values ranged from approximately:
-
-```text
-0.55 to 0.75
-```
-
-This is plausible for an NZD/USD exchange-rate series.
-
-The average exchange rate in the cleaned sample was approximately:
-
-```text
-0.652 USD per 1 NZD
-```
-
-The daily log return series had an average close to zero, which is typical for daily financial return data.
-
-The exchange-rate level series is persistent and moves gradually over time, while the daily return series is much noisier. This suggests that short-term exchange-rate forecasting may be difficult and should be evaluated carefully against simple baseline models.
-
-## Visual Analysis Completed
-
-Three main plots were created:
-
-1. **NZD/USD exchange-rate level over time**
-   Shows the broad movement of the exchange rate across the sample.
-
-2. **Log NZD/USD exchange rate over time**
-   Preserves the shape of the original series while preparing the data for return calculations.
-
-3. **NZD/USD daily log returns over time**
-   Shows day-to-day exchange-rate changes. The return series fluctuates around zero and contains occasional spikes, suggesting periods of higher volatility.
-
-## Current Repository Structure
-
-The project is organized around separating raw data, processed data, and analysis notebooks.
-
-Expected structure:
+## Repository structure
 
 ```text
 NZD-USD-Exchange-Rate-Forecaster/
-  data/
-    raw/
-    processed/
-  notebooks/
-    01_data_audit_and_transformation.ipynb
-  README.md
+│
+├── data/
+│   ├── raw/
+│   │   └── USD to NZD Exchange Rate.csv
+│   └── processed/
+│       └── cleaned/transformed NZD/USD dataset
+│
+├── notebooks/
+│   ├── 01_data_audit_and_transformation.ipynb
+│   ├── 02_baseline_forecasting.ipynb
+│   ├── 03_stationarity_and_autocorrelation.ipynb
+│   ├── 04_arima_modeling.ipynb
+│   ├── 05_machine_learning_forecasting.ipynb
+│   └── 06_project_summary.ipynb
+│
+├── README.md
+└── requirements.txt
 ```
 
-## Next Steps
+## Workflow
 
-The next stage of the project will focus on baseline forecasting.
+### 1. Data audit and transformation
 
-Planned next notebook:
+The raw exchange-rate data was inspected for structure, date ordering, duplicate dates, missing values, and plausibility.
+
+Key steps included:
+
+* Converting observation dates to datetime format
+* Sorting the data chronologically
+* Removing missing exchange-rate observations
+* Creating a log exchange-rate series
+* Creating daily log returns
+* Saving a cleaned processed dataset for modeling
+
+The project keeps the raw data unchanged and saves transformed data separately.
+
+### 2. Baseline forecasting
+
+Simple baseline models were created before fitting more complex models.
+
+The main baseline approaches were:
+
+* Naïve forecast: use the previous exchange-rate value as the next forecast
+* Drift forecast: adjust the previous value by the average historical change
+
+The baseline models established a minimum performance threshold that ARIMA and machine-learning models needed to beat.
+
+### 3. Stationarity and autocorrelation analysis
+
+The project analyzed the exchange-rate level, log exchange-rate level, and daily log returns using visual inspection, autocorrelation plots, and Augmented Dickey-Fuller tests.
+
+Main findings:
+
+* The raw exchange-rate level was highly persistent and likely nonstationary.
+* The log exchange-rate level was also likely nonstationary.
+* Daily log returns appeared stationary.
+* Daily returns showed weak autocorrelation, suggesting limited linear predictability from recent returns.
+
+These findings informed the ARIMA modeling strategy.
+
+### 4. ARIMA modeling
+
+ARIMA-style models were fitted to the log NZD/USD exchange-rate series.
+
+The initial model was:
 
 ```text
-02_baseline_forecasting.ipynb
+ARIMA(0, 1, 0)
 ```
 
-The goal of the next stage is to build simple benchmark forecasts before trying more complex models.
+This model acts as a random-walk model on the log exchange rate.
 
-The most important baseline will be the naïve/random-walk forecast:
+Additional ARIMA specifications were tested, including:
 
 ```text
-Tomorrow's exchange rate = today's exchange rate
+ARIMA(1, 1, 0)
+ARIMA(0, 1, 1)
+ARIMA(1, 1, 1)
+ARIMA(2, 1, 0)
+ARIMA(0, 1, 2)
 ```
 
-This baseline is especially important for exchange-rate forecasting because financial time series are often difficult to beat with more complex models.
+In the fixed-origin multi-step test setup, the best ARIMA model produced only a very small improvement over the random-walk ARIMA model and did not outperform the drift baseline.
 
-Future work may include:
+### 5. Supervised machine-learning forecasting
 
-* random-walk baseline forecasting;
-* drift baseline forecasting;
-* train/test split using time order;
-* walk-forward validation;
-* forecast accuracy metrics such as MAE and RMSE;
-* ARIMA modeling;
-* comparison of model forecasts against baseline forecasts;
-* dashboard development for currency-planning use cases.
+The time series was converted into a supervised learning dataset by creating a next-period target variable:
 
-## Project Goal
+```text
+target_nzd_usd_next
+```
 
-The final goal is to build a credible NZD/USD exchange-rate forecasting and analysis project that emphasizes:
+Lagged and rolling features were created from the exchange-rate level and return series.
 
-* correct financial-data interpretation;
-* clean time-series methodology;
-* honest baseline comparison;
-* clear communication of uncertainty;
-* practical relevance for international students and families dealing with NZD/USD exchange-rate risk.
+Feature examples included:
+
+* Current exchange rate
+* Daily log return
+* Lagged exchange-rate values
+* Lagged returns
+* Rolling means
+* Rolling standard deviations
+
+The models tested were:
+
+* Linear regression
+* Ridge regression
+* Random forest regression
+
+The supervised models were evaluated using a one-step-ahead forecasting setup.
+
+## Key results
+
+### Fixed-origin ARIMA test-period comparison
+
+| Model                                |      MAE |     RMSE |
+| ------------------------------------ | -------: | -------: |
+| Naïve baseline                       | 0.029734 | 0.033495 |
+| Drift baseline                       | 0.020696 | 0.025189 |
+| ARIMA(0, 1, 0)                       | 0.029734 | 0.033495 |
+| Best ARIMA candidate: ARIMA(1, 1, 1) | 0.029702 | 0.033464 |
+
+The drift baseline performed best in the fixed-origin ARIMA test setup.
+
+### One-step-ahead machine-learning comparison
+
+| Model             |      MAE |     RMSE |
+| ----------------- | -------: | -------: |
+| Naïve baseline    | 0.002688 | 0.003580 |
+| Drift baseline    | 0.002686 | 0.003579 |
+| Linear regression | 0.002728 | 0.003627 |
+| Ridge regression  | 0.002726 | 0.003626 |
+| Random forest     | 0.003458 | 0.004415 |
+
+The supervised machine-learning models did not outperform the one-step-ahead baseline forecasts.
+
+## Important evaluation note
+
+The ARIMA and machine-learning notebooks use different forecasting setups.
+
+The ARIMA notebook uses a fixed-origin multi-step forecast, where models are trained up to the training cutoff and then forecast across the full test period.
+
+The machine-learning notebook uses a one-step-ahead supervised learning setup, where each row uses current and past information to predict the next observed exchange rate.
+
+Because of this difference, ARIMA and machine-learning metrics should not be compared directly without considering the forecasting setup. Within each setup, models are compared against appropriate baselines.
+
+## Main conclusion
+
+Across the project, simple baseline models remained difficult to beat.
+
+The NZD/USD exchange-rate level was highly persistent, meaning the current exchange rate was usually the strongest predictor of the next observed exchange rate. Stationarity and autocorrelation analysis showed that daily returns had weak linear dependence, which helped explain why more complex models struggled to add predictive value.
+
+The ARIMA models produced only small improvements over a random-walk specification and did not beat the drift baseline in the fixed-origin test setup. The supervised machine-learning models also failed to outperform one-step-ahead naïve and drift baselines.
+
+Overall, the project demonstrates an important forecasting principle:
+
+> More complex models are only useful if they improve out-of-sample performance against strong baselines.
+
+## Skills demonstrated
+
+This project demonstrates:
+
+* Time-series data cleaning
+* Missing-value handling
+* Log transformations
+* Return calculation
+* Exploratory time-series visualization
+* Baseline forecasting
+* MAE and RMSE evaluation
+* Autocorrelation analysis
+* Augmented Dickey-Fuller stationarity testing
+* ARIMA modeling
+* Supervised learning feature engineering
+* Linear regression
+* Ridge regression
+* Random forest regression
+* Model comparison against baselines
+* Interpretation of forecasting results
+
+## Technologies used
+
+* Python
+* pandas
+* NumPy
+* Matplotlib
+* statsmodels
+* scikit-learn
+* Jupyter Notebook
+
+## Resume-ready summary
+
+Built an end-to-end NZD/USD exchange-rate forecasting project using historical daily exchange-rate data. Cleaned and transformed raw time-series data, created baseline forecasts, tested stationarity and autocorrelation, fitted ARIMA models, engineered lagged and rolling features for supervised learning, and evaluated linear, regularized, and tree-based models against naïve and drift baselines. Found that simple baselines outperformed more complex models, highlighting the importance of rigorous out-of-sample evaluation in financial forecasting.
